@@ -1,16 +1,3 @@
-<?php
-// index.php
-$pdf  = '20260624125856.pdf';
-$ruta = __DIR__ . '/' . $pdf;
-
-if (!file_exists($ruta)) {
-    http_response_code(404);
-    die('❌ El archivo PDF no existe en el servidor.');
-}
-
-$url  = rawurlencode($pdf);
-$size = round(filesize($ruta) / 1024, 2);
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -81,7 +68,7 @@ $size = round(filesize($ruta) / 1024, 2);
             display: block;
         }
 
-        /* Mensajes de estado */
+        /* Mensaje de estado */
         #estado {
             color: #fff;
             text-align: center;
@@ -90,7 +77,7 @@ $size = round(filesize($ruta) / 1024, 2);
             opacity: .85;
         }
 
-        /* Barra inferior de navegación de páginas */
+        /* Barra inferior de paginación */
         #paginador {
             background: #1e1e1e;
             color: #fff;
@@ -126,12 +113,11 @@ $size = round(filesize($ruta) / 1024, 2);
 
     <header>
         <div class="info">
-            📄 <strong>Documento PDF</strong><br>
-            <small><?= $size ?> KB</small>
+            📄 <strong>Documento PDF</strong>
         </div>
         <div class="acciones">
-            <!-- Único botón que permite descargar, y solo al pulsarlo -->
-            <a href="<?= $url ?>" download>⬇️ Descargar</a>
+            <!-- Único enlace de descarga: solo actúa si el usuario lo pulsa -->
+            <a href="20260624125856.pdf" download>⬇️ Descargar</a>
         </div>
     </header>
 
@@ -150,7 +136,7 @@ $size = round(filesize($ruta) / 1024, 2);
 pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-const URL_PDF   = <?= json_encode($pdf) ?>;
+const URL_PDF   = '20260624125856.pdf';   // <-- ruta del PDF
 const visor     = document.getElementById('visor');
 const estado    = document.getElementById('estado');
 const paginador = document.getElementById('paginador');
@@ -163,7 +149,7 @@ let paginaActual = 1;
 let renderizado = false;
 
 /**
- * Calcula el ancho de render según el ancho de pantalla y el DPR
+ * Calcula el viewport según el ancho de pantalla y el DPR
  * para obtener buena nitidez en móviles (retina).
  */
 function calcularViewport(page) {
@@ -188,8 +174,8 @@ async function renderPagina(num) {
         // Limpiar visor
         visor.innerHTML = '';
 
-        const canvas  = document.createElement('canvas');
-        const ctx     = canvas.getContext('2d');
+        const canvas = document.createElement('canvas');
+        const ctx    = canvas.getContext('2d');
 
         canvas.width  = viewport.width;
         canvas.height = viewport.height;
@@ -245,7 +231,7 @@ btnPrev.addEventListener('click', () => {
     }
 });
 btnNext.addEventListener('click', () => {
-    if (paginaActual < pdfDoc.numPages) {
+    if (pdfDoc && paginaActual < pdfDoc.numPages) {
         paginaActual++;
         renderPagina(paginaActual);
     }
